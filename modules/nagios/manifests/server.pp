@@ -6,6 +6,7 @@
 #
 # === Details:
 #
+# Depends on class apache2.
 # The Web interface will be available at http://12.34.56.78/nagios3/, where 12.34.56.78 is the
 # IP address of the server this is being applied on. 
 # The htaccess user is "nagiosadmin" (the nagios3 package default), the password can be passed as a parameter.
@@ -35,6 +36,8 @@ class nagios::server (
     $htpass        = 'Prague2013'
 ) {
 
+  include apache2
+
   package { 'nagios3': ensure => installed }
 
   file { '/etc/nagios3/conf.d/contacts_nagios2.cfg':
@@ -59,6 +62,7 @@ class nagios::server (
   # update the existing htpasswd file
   exec { 'update-nagios-htpasswd':
     command   => "/usr/bin/htpasswd -b /etc/nagios3/htpasswd.users nagiosadmin $htpass",
+    require   => [ File['/etc/nagios3/htpasswd.users'], Package['apache2'] ],
     logoutput => true,
   }
 }

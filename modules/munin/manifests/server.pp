@@ -1,9 +1,10 @@
 # == Class: munin::server
 #
-# Installs munin. Also the apache2 package (while trying to configure the bare minimum to avoid a possible clash).
+# Installs munin. 
 # For Debian based systems.
 #
 # === Details:
+# Depends on class apache2.
 # The Web interface will be available at http://12.34.56.78/nagios3/, where 12.34.56.78 is the
 # IP address of the server this is being applied on. 
 # The htaccess user and password can be passed as parameters.
@@ -33,24 +34,21 @@ class munin::server (
     $htpass = 'Prague2013'
 ) {
     
+  include apache2
+
   package { 'munin': ensure => installed }
 
-  package { 'apache2': ensure => present }
 
   file { '/etc/apache2/conf.d/munin':
     ensure  => link,
     target  => '/etc/munin/apache.conf',
     require => Package['apache2'],
+    notify  => Service['apache2'],
   }
 
   file { '/etc/munin/apache.conf':
     content => template('munin/apache.conf.erb'),
     require => Package['munin'],
-  }
-
-  service { 'apache2':
-    ensure    => running,
-    subscribe => File['/etc/munin/apache.conf'],
   }
 
   # Ensure the htpasswd file exists (or create an empty one).
@@ -62,7 +60,7 @@ class munin::server (
   # update the existing htpasswd file
   exec { 'update-munin-htpasswd':
     command   => "/usr/bin/htpasswd -b /etc/munin/munin-htpasswd $htuser $htpass",
-    require   => File['/etc/munin/munin-htpasswd'],
+    require   => [ File['/etc/munin/munin-htpasswd'], Package['apache2'] ],
     logoutput => true,
   }
 }
