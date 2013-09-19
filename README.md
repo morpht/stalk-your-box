@@ -3,7 +3,7 @@
 This manifest was created as part of a simple demo for our presentation at DrupalCon Prague 2013:
   https://prague2013.drupal.org/session/have-you-been-stalking-your-servers
 
-It installs Munin and Nagios on your server and protects them with Basic access authentication.
+It installs Munin and Nagios on your server and protects them with Basic access authentication. Installs php-apc and deploys apc.php
 
 ## Description
 A small Puppet manifest to get you started with monitoring your dev LAMP server.
@@ -15,6 +15,7 @@ Currently for Ubuntu 12.04 LTS (but likely to work on newer versions and other D
 ## Used components
 -    nagios3
 -    munin, munin-node
+-    php-apc, apc.php dashboard
 
 ## Requires
 The box provisioned with this manifest needs to be able to deliver emails, at least to the nagios contact email address
@@ -55,7 +56,7 @@ The Web interface will be available at http://12.34.56.78/nagios3/ and http://12
 It might take at least 15 minutes before you will be able to see *some* values in the Munin graphs.
 
 ### Basic access authentication
-The manifest deployes basic authentication with these defaults:
+The manifest deploys basic authentication with these defaults:
 -   The Munin app:  `munin:Prague2013`
 -   The Nagios app: `nagiosadmin:Prague2013`
 
