@@ -18,14 +18,19 @@
 # Configured MTA. Otherwise, the nagios3 package will install (but probably won't configure the way you would like) postfix.
 #
 # === Parameters:
-##
+#
 # [*htpass*]
+# The password for the basic authentication.
+# The user is 'nagiosadmin', which is the default from the nagios3 package.
+#
+# [*contact_email*]
+# The email addres to send nagios alerts to.
 #
 # === Examples
 #
 # include nagios::server
 #   or
-#  class { 'nagios::server':  contact_email => 'cermak.m@gmail.com',  htpass => 'Prague2013' }
+#  class { 'nagios::server': contact_email => 'root@localhost', htpass => 'Prague2013' }
 #
 # === Authors
 #
