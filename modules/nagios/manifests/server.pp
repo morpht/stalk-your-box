@@ -26,6 +26,9 @@
 # [*contact_email*]
 # The email addres to send nagios alerts to.
 #
+# [*check_external_commands*] 
+# Whether to enable external command checking. 
+#
 # === Examples
 #
 # include nagios::server
@@ -37,8 +40,9 @@
 # Marji Cermak <marji@morpht.com>, http://morpht.com
 #
 class nagios::server ( 
-    $contact_email = 'root@localhost',
-    $htpass        = 'Prague2013'
+    $contact_email           = 'root@localhost',
+    $htpass                  = 'Prague2013',
+    $check_external_commands = true
 ) {
 
   include apache2
@@ -56,6 +60,34 @@ class nagios::server (
   service { 'nagios3':
     ensure    => running,
     subscribe => File['/etc/nagios3/conf.d/contacts_nagios2.cfg'],
+  }
+
+  # We own the nagios.cfg file to enable external commands via gui.
+  file { '/etc/nagios3/nagios.cfg':
+    content => template('nagios/nagios.cfg.erb'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    require => Package['nagios3'],
+    notify  => Service['nagios3'],
+  }
+  if $check_external_commands == true {
+    file { '/var/lib/nagios3':
+      ensure  => directory,
+      owner   => 'nagios',
+      group   => 'nagios',
+      mode    => '0751',
+      require => Package['nagios3'],
+      notify  => Service['nagios3'],
+    }
+    file { '/var/lib/nagios3/rw':
+      ensure  => directory,
+      owner   => 'nagios',
+      group   => 'www-data',
+      mode    => '2710',
+      require => File['/var/lib/nagios3'],
+      notify  => Service['nagios3'],
+    }
   }
 
   # Ensure the htpasswd file exists (or create an empty one).
